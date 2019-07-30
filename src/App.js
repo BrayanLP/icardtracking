@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { connect } from 'react-redux';
@@ -6,30 +6,28 @@ import { connect } from 'react-redux';
 import { simpleAction } from './actions/simpleAction';
 import { fetchProducts } from './actions/productAction'
 import { getProducts } from './reducers/productReducer';
+import Cards from './modules/Cards';
+// import config from './config'
+// import firebase from 'firebase/app';
 class App extends Component {
-  simpleAction = (event) => {
-    this.props.simpleAction();
-    this.props.fetchProducts()
-  }
-  componentWillMount() {
+  constructor(props) {
 
+    super(props)
+    // firebase.initializeApp(config)
+  }
+  // simpleAction = (event) => {
+  //   this.props.simpleAction();
+  //   this.props.fetchProducts()
+  // }
+  componentWillMount() {
     this.props.fetchProducts()
   }
   render() {
     const { products } = this.props
     return (
-      <div  >
-
-        <button onClick={this.simpleAction}>Test redux action</button>
-        <ol>
-          {products.map((res, index) => {
-            return (
-              <li key={index + 1}>{res.name}</li>
-            )
-          })
-          }
-        </ol>
-      </div >
+      <Fragment>
+        <Cards></Cards>
+      </Fragment>
     );
   }
 }
