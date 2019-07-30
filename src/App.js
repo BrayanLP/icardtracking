@@ -1,26 +1,47 @@
-import React from 'react';
+import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { connect } from 'react-redux';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import { simpleAction } from './actions/simpleAction';
+import { fetchProducts } from './actions/productAction'
+import { getProducts } from './reducers/productReducer';
+class App extends Component {
+  simpleAction = (event) => {
+    this.props.simpleAction();
+    this.props.fetchProducts()
+  }
+  componentWillMount() {
+
+    this.props.fetchProducts()
+  }
+  render() {
+    const { products } = this.props
+    return (
+      <div  >
+
+        <button onClick={this.simpleAction}>Test redux action</button>
+        <ol>
+          {products.map((res, index) => {
+            return (
+              <li key={index + 1}>{res.name}</li>
+            )
+          })
+          }
+        </ol>
+      </div >
+    );
+  }
 }
 
-export default App;
+const mapStateToProps = state => {
+  return ({
+    products: getProducts(state.productsReducer)
+  })
+}
+const mapDispatchToProps = dispatch => ({
+  simpleAction: () => dispatch(simpleAction()),
+  fetchProducts: () => dispatch(fetchProducts())
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
