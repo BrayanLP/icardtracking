@@ -1,4 +1,6 @@
 import { Firestore } from "../config";
+import * as moment from 'moment';
+
 
 export const FETCH_CARD_PENDING = 'FETCH_CARD_PENDING';
 export const FETCH_CARD_SUCCESS = 'FETCH_CARD_SUCCESS';
@@ -49,11 +51,18 @@ export function fetchCards() {
          const cardsRes = []
          snapshot.forEach((doc) => {
             const data = doc.data()
+            const start_date = data.start_date && data.start_date.seconds
+            const end_date = data.end_date && data.end_date.seconds
+
+            // console.log(new Date(start_date * 1000))
+
             res.push([
                data.bank,
                data.title,
-               new Date(2019, 2, 10),
-               new Date(2019, 3, 1)
+               // moment(start_date).format('LLLL'),
+               //moment(start_date).toDate(),
+               new Date(start_date * 1000),
+               new Date(end_date * 1000),
             ])
             cardsRes.push({ ...data, id: doc.id })
 

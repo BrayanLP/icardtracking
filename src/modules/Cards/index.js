@@ -4,7 +4,19 @@ import Chart from 'react-google-charts';
 import { Firestore } from '../../config';
 import { fetchCards } from '../../actions/cardAction';
 import { getCards, getGrafic } from '../../reducers/cardReducer';
+import { Field, reduxForm } from 'redux-form'
+import Modal from 'react-modal';
 
+const customStyles = {
+   content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)'
+   }
+};
 
 class Cards extends Component {
    constructor(props) {
@@ -12,6 +24,9 @@ class Cards extends Component {
       this.state = {
          count: 0
       }
+      this.openModal = this.openModal.bind(this);
+      this.afterOpenModal = this.afterOpenModal.bind(this);
+      this.closeModal = this.closeModal.bind(this);
       // this.addCard = this.addCard.bind()
    }
    componentWillMount() {
@@ -35,6 +50,18 @@ class Cards extends Component {
          }
       }
    ];
+   openModal() {
+      this.setState({ modalIsOpen: true });
+   }
+
+   afterOpenModal() {
+      // references are now sync'd and can be accessed.
+      this.subtitle.style.color = '#f00';
+   }
+
+   closeModal() {
+      this.setState({ modalIsOpen: false });
+   }
    // addCard = () => {
    //    const { count } = this.state
    //    console.log('agregar tarjeta')
@@ -55,7 +82,7 @@ class Cards extends Component {
          <Fragment>
             <center>
                <h1>Cards</h1>
-               <button onClick={() => this.addCard()}>Agregar Tarjeta</button>
+               <button onClick={this.openModal}>Agregar Tarjeta</button>
                <Chart
                   width={'95%'}
                   height={'600px'}
@@ -70,6 +97,28 @@ class Cards extends Component {
                   rootProps={{ 'data-testid': '4' }}
                   chartEvents={this.chartEvents(this.props)}
                />
+               <Modal
+                  isOpen={this.state.modalIsOpen}
+                  onAfterOpen={this.afterOpenModal}
+                  onRequestClose={this.closeModal}
+                  style={customStyles}
+                  contentLabel="Example Modal"
+               >
+
+                  <h2 ref={subtitle => this.subtitle = subtitle}>Crear una tarjeta</h2>
+                  <form>
+                     <input name='title' placeholder='titulo' />
+                     <select name='bank'>
+                        <option value="interbank">Intebank</option>
+                        <option value="bcp">BCP</option>
+                        <option value="scotiabank">Scotiabank</option>
+                        <option value="banco_falabella">Banco Falabella</option>
+                     </select>
+                     <input name='start_date' placeholder='fecha inicio' />
+                     <input name='end_date' placeholder='fecha fin' />
+                     <button>Crear</button>
+                  </form>
+               </Modal>
             </center>
          </Fragment>
       );
@@ -85,4 +134,11 @@ const mapDispatchToProps = dispatch => ({
    fetchCards: () => dispatch(fetchCards())
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Cards);
+// Decorate with redux-form
+Cards = reduxForm({
+   form: 'createCard' // a unique identifier for this form
+})(Cards)
+
+Cards = connect(mapStateToProps, mapDispatchToProps)(Cards)
+
+export default Cards
